@@ -1,0 +1,6 @@
+env/bin
+env/build
+env/include
+env/lib
+env/local
+*.pyc
