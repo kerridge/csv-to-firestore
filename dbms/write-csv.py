@@ -58,6 +58,8 @@ with open(file_path) as csv_file:
         # extract the line headers
         if line_count == 0:
             for header in row:
+                # uppercase for consistency
+                header = header.upper()
                 headers.append(header)
             line_count += 1
         else:
@@ -85,11 +87,22 @@ with open(file_path) as csv_file:
 
 # loop through and write data to firestore
 # a batch is a set of transactions that have been grouped together
+# 500 transactions per batch is firestore limit
 for batched_data in batch_data(data, 499):
     batch = store.batch()
     for data_item in batched_data:
+
+        # store entries under their own UID
+        if collection_name == 'business-owners':
+            key = data_item['ACCOUNT NUMBER']
+        elif collection_name == 'business-licences':
+            key = data_item['ID']
+
         # grab our document reference object
-        doc_ref = store.collection(collection_name).document()
+        # create a new document with `key` as UID
+        doc_ref = store.collection(collection_name).document(key)
+
+        # fill our batch store with `set` transactions
         batch.set(doc_ref, data_item)
     batch.commit()
 
