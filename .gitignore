@@ -6,3 +6,5 @@ env/local
 *.pyc
 test-241002-0609914a6747.json
 serviceCredentials.json
+data-subsets/business-licences-subset.numbers
+data-subsets/business-owners-subset.numbers
