@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 import firebase_admin
 import google.cloud
 from firebase_admin import credentials, firestore
@@ -10,6 +11,9 @@ firebase_admin.initialize_app(cred)
 store = firestore.client()
 
 # csv path and name of firestore collection to create
+# file_path = "data-subsets/business-owners-subset-utf-8.csv"
+# collection_name = "business-owners"
+
 file_path = "data-subsets/business-licences-subset-utf-8.csv"
 collection_name = "business-licences"
 
@@ -21,14 +25,24 @@ def batch_data(iterable, n=1):
         yield iterable[ndx:min(ndx + n, l)]
 
 
-# def get_data_item(item, data_type):
-# 	# Add other data types you want to handle here
-#     if data_type == 'int':
-#         return int(item)
-#     elif data_type == 'bool':
-#         return bool(item)
-#     else:
-#         return item
+def attemptParse(item):
+
+    # 2000-12-18T00:00:00 // expected format
+    # if it is 19 chars long and capital 'T' is 11th char
+    if len(item) == 19 and item[10] == 'T':
+        try:
+            # a strftime safe char
+            item = item.replace('T', ',')
+            # format string to date-string
+            s = datetime.strptime(item, '%Y-%m-%d,%H:%M:%S')
+            # parse date-string to datetime obj
+            item = datetime.strftime(s, '%Y-%m-%d %H:%M:%S')
+        except:
+            print('ERROR: could not parse datetime')
+            pass
+    
+
+    return item
 
 
 # data to return
@@ -48,7 +62,17 @@ with open(file_path) as csv_file:
         else:
             obj = {}
             for idx, item in enumerate(row):
-                obj[headers[idx]] = item
+                # apply any transformations to `item` here
+
+                # dont write the object if null
+                if item != "":
+                    # attempt to parse object to other types
+                    item = attemptParse(item)
+
+                    # save item to json
+                    obj[headers[idx]] = item
+
+
             data.append(obj)
             line_count += 1
     print(f'Processed {line_count} lines.')
