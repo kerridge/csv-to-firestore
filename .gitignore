@@ -5,3 +5,4 @@ env/lib
 env/local
 *.pyc
 test-241002-0609914a6747.json
+serviceCredentials.json

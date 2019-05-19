@@ -1,15 +1,9 @@
 import pyrebase
+import firebase_admin
+import google.cloud
 
 db = None
 user = None
-
-
-def main():
-  print("Hello World!")
-  
-if __name__== "__main__":
-  main()
-
 
 # a method to make the connection to firebase and set a user + db object
 def db_connect():
@@ -19,8 +13,10 @@ def db_connect():
         'databaseURL': "https://test-241002.firebaseio.com",
         'projectId': "test-241002",
         'storageBucket': "test-241002.appspot.com",
-        "serviceAccount": "../test-241002-0609914a6747.json"
+        "serviceAccount": "serviceCredentials.json"
     }
+
+    # test-241002-0609914a6747
 
     # tell python to use globals
     global user
@@ -39,9 +35,12 @@ def db_connect():
     db = firebase.database()
 
 
+    return db
+
+
 # method to read data from our db
-def read():
-    # querying
+def db_read():
+
     all_agents = db.child("agents").get(user['idToken']).val()
 
     lana_data = db.child("agents").child("Lana").get(user['idToken']).val()
@@ -50,16 +49,25 @@ def read():
     print(lana_data)
 
 
-def create():
+# method to create some mock data
+def db_create():
     # create data
     lana = {"name": "Lana Kane", "agency": "Figgis Agency"}
+    archer = {"name": "Stirling Archer", "agency": "Figgis Agency"}
 
     # push update
     db.child("agents").child("Lana").set(lana, user['idToken'])
+    db.child("agents").child("Archer").set(archer, user['idToken'])
 
 
 
-
+def main():
+  db_connect()
+#   db_create()
+  db_read()
+  
+if __name__== "__main__":
+  main()
 
 
 
