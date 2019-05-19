@@ -63,7 +63,7 @@ def db_create():
 
 def main():
   db_connect()
-#   db_create()
+  db_create()
   db_read()
   
 if __name__== "__main__":

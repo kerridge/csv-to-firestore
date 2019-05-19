@@ -3,8 +3,8 @@ import firebase_admin
 import google.cloud
 from firebase_admin import credentials, firestore
 
-cred = credentials.Certificate("./serviceCredentials.json")
-app = firebase_admin.initialize_app(cred)
+cred = credentials.Certificate("serviceCredentials.json")
+firebase_admin.initialize_app(cred)
 
 # firestore connection
 store = firestore.client()
@@ -21,14 +21,14 @@ def batch_data(iterable, n=1):
         yield iterable[ndx:min(ndx + n, l)]
 
 
-def get_data_item(item, data_type):
-	# Add other data types you want to handle here
-    if data_type == 'int':
-        return int(item)
-    elif data_type == 'bool':
-        return bool(item)
-    else:
-        return item
+# def get_data_item(item, data_type):
+# 	# Add other data types you want to handle here
+#     if data_type == 'int':
+#         return int(item)
+#     elif data_type == 'bool':
+#         return bool(item)
+#     else:
+#         return item
 
 
 # data to return
@@ -36,7 +36,6 @@ data = []
 # our list of csv coulmn headers to be extracted
 headers = []
 
-data_types = []
 with open(file_path) as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -49,8 +48,7 @@ with open(file_path) as csv_file:
         else:
             obj = {}
             for idx, item in enumerate(row):
-                # obj[headers[idx]] = item
-                get_data_item(item, data_types[idx])
+                obj[headers[idx]] = item
             data.append(obj)
             line_count += 1
     print(f'Processed {line_count} lines.')
