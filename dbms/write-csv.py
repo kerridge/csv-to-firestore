@@ -19,6 +19,7 @@ collection_name = "business-licences"
 
 
 # basically a method to stop the whole csv from being loaded into memory
+# and to batch transactions together
 def batch_data(iterable, n=1):
     l = len(iterable)
     for ndx in range(0, l, n):
@@ -27,16 +28,16 @@ def batch_data(iterable, n=1):
 
 def attemptParse(item):
 
-    # 2000-12-18T00:00:00 // expected format
+    # 2000-12-18T00:00:00 // expected date format
     # if it is 19 chars long and capital 'T' is 11th char
     if len(item) == 19 and item[10] == 'T':
         try:
             # a strftime safe char
-            item = item.replace('T', ',')
+            item = item.replace('T', ' ')
             # format string to date-string
-            s = datetime.strptime(item, '%Y-%m-%d,%H:%M:%S')
-            # parse date-string to datetime obj
-            item = datetime.strftime(s, '%Y-%m-%d %H:%M:%S')
+            item = datetime.strptime(item, '%Y-%m-%d %H:%M:%S')
+            # # parse date-string to datetime obj
+            # item = datetime.strftime(s, '%Y-%m-%d %H:%M:%S')
         except:
             print('ERROR: could not parse datetime')
             pass
@@ -64,10 +65,14 @@ with open(file_path) as csv_file:
             for idx, item in enumerate(row):
                 # apply any transformations to `item` here
 
-                # dont write the object if null
+                # dont write the object if null, NoSQL benefits
                 if item != "":
                     # attempt to parse object to other types
                     item = attemptParse(item)
+
+                    # headers[idx] gives us the header for the current column
+                    # e.g. 'DATE ISSUED'
+                    # could be useful if we transform column names meaningfully
 
                     # save item to json
                     obj[headers[idx]] = item
