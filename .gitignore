@@ -1,10 +1,19 @@
+# python virtual env
 env/bin
 env/build
 env/include
 env/lib
 env/local
+
+# python cache files
 *.pyc
+
+# old api credentials filename
 test-241002-0609914a6747.json
+
+# my service accounts api connection
 serviceCredentials.json
+
+# datasets not needed
 data-subsets/business-licences-subset.numbers
 data-subsets/business-owners-subset.numbers
