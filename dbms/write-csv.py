@@ -76,9 +76,8 @@ with open(file_path) as csv_file:
                     # attempt to parse object to other types
                     item = attemptParse(item)
 
-                    # headers[idx] gives us the header for the current column
-                    # e.g. 'DATE ISSUED'
-                    # could be useful if we transform column names meaningfully
+                    # headers[idx] gives us the header for the current cell
+                    # e.g. 'DATE_ISSUED'
 
                     # if our header is a name field, add to sub collection
                     if headers[idx] in name_fields:

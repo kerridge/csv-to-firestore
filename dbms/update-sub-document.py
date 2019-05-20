@@ -21,7 +21,7 @@ update_count = 0
 
 for licence in licences:
     # grab the id of our account
-    ref_to_owner = licence.to_dict()['ACCOUNT NUMBER']
+    ref_to_owner = licence.to_dict()['ACCOUNT_NUMBER']
 
     # licence obj to update
     licence_ref = licences_ref.document(licence.id)
