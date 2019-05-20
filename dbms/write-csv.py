@@ -11,11 +11,11 @@ firebase_admin.initialize_app(cred)
 store = firestore.client()
 
 # csv path and name of firestore collection to create
-# file_path = "data-subsets/business-owners-subset-utf-8.csv"
-# collection_name = "business-owners"
+file_path = "data-subsets/business-owners-subset-utf-8.csv"
+collection_name = "business-owners"
 
-file_path = "data-subsets/business-licences-subset-utf-8.csv"
-collection_name = "business-licences"
+# file_path = "data-subsets/business-licences-subset-utf-8.csv"
+# collection_name = "business-licences"
 
 
 # basically a method to stop the whole csv from being loaded into memory
@@ -26,20 +26,19 @@ def batch_data(iterable, n=1):
         yield iterable[ndx:min(ndx + n, l)]
 
 
+# this method has try/catch code for attempting to parse values
 def attemptParse(item):
-
-    # 2000-12-18T00:00:00 // expected date format
+    # --------------- DATES ---------------
+    # 2000-12-18T00:00:00 // expected date/time format
     # if it is 19 chars long and capital 'T' is 11th char
     if len(item) == 19 and item[10] == 'T':
         try:
             # a strftime safe char
             item = item.replace('T', ' ')
-            # format string to date-string
+            # format string to date obj
             item = datetime.strptime(item, '%Y-%m-%d %H:%M:%S')
-            # # parse date-string to datetime obj
-            # item = datetime.strftime(s, '%Y-%m-%d %H:%M:%S')
         except:
-            print('ERROR: could not parse datetime')
+            print(f'ERROR: could not parse: {item}')
             pass
     
 
@@ -60,6 +59,8 @@ with open(file_path) as csv_file:
             for header in row:
                 # uppercase for consistency
                 header = header.upper()
+                # remove spaces, add underscores
+                header = header.replace(' ', '_')
                 headers.append(header)
             line_count += 1
         else:
@@ -82,7 +83,7 @@ with open(file_path) as csv_file:
 
             data.append(obj)
             line_count += 1
-    print(f'Processed {line_count} lines.')
+    print(f'Processed {line_count} lines')
 
 
 # loop through and write data to firestore
@@ -94,7 +95,7 @@ for batched_data in batch_data(data, 499):
 
         # store entries under their own UID
         if collection_name == 'business-owners':
-            key = data_item['ACCOUNT NUMBER']
+            key = data_item['ACCOUNT_NUMBER']
         elif collection_name == 'business-licences':
             key = data_item['ID']
 
