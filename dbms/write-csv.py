@@ -7,15 +7,18 @@ from firebase_admin import credentials, firestore
 cred = credentials.Certificate("serviceCredentials.json")
 firebase_admin.initialize_app(cred)
 
-# firestore connection
+# db instance
 store = firestore.client()
 
 # csv path and name of firestore collection to create
-file_path = "data-subsets/business-owners-subset-utf-8.csv"
-collection_name = "business-owners"
+# file_path = "data-subsets/business-owners-subset-utf-8.csv"
+# collection_name = "business-owners"
 
-# file_path = "data-subsets/business-licences-subset-utf-8.csv"
-# collection_name = "business-licences"
+file_path = "data-subsets/business-licences-subset-utf-8.csv"
+collection_name = "business-licences"
+
+name_fields = [u'OWNER_FIRST_NAME', u'OWNER_MIDDLE_INITIAL', u'OWNER_LAST_NAME']
+address_fields = [u'CITY', u'STATE', u'ZIP_CODE', u'ADDRESS']
 
 
 # basically a method to stop the whole csv from being loaded into memory
@@ -34,9 +37,9 @@ def attemptParse(item):
     if len(item) == 19 and item[10] == 'T':
         try:
             # a strftime safe char
-            item = item.replace('T', ' ')
+            temp = item.replace('T', ' ')
             # format string to date obj
-            item = datetime.strptime(item, '%Y-%m-%d %H:%M:%S')
+            item = datetime.strptime(temp, '%Y-%m-%d %H:%M:%S')
         except:
             print(f'ERROR: could not parse: {item}')
             pass
@@ -77,8 +80,23 @@ with open(file_path) as csv_file:
                     # e.g. 'DATE ISSUED'
                     # could be useful if we transform column names meaningfully
 
-                    # save item to json
-                    obj[headers[idx]] = item
+                    # if our header is a name field, add to sub collection
+                    if headers[idx] in name_fields:
+                        # if we don't have an entry for it yet
+                        if 'OWNER_FULL_NAME' not in obj.keys():
+                            obj['OWNER_FULL_NAME'] = {}
+                        # save to json under full name dict entry
+                        obj['OWNER_FULL_NAME'][headers[idx]] = item
+                    elif headers[idx] in address_fields:
+                        # if we don't have an entry for it yet
+                        if 'BUSINESS_ADDRESS' not in obj.keys():
+                            obj['BUSINESS_ADDRESS'] = {}
+                        # save to json under full name dict entry
+                        obj['BUSINESS_ADDRESS'][headers[idx]] = item
+                    else:
+                        # save item to json
+                        obj[headers[idx]] = item
+                    
 
 
             data.append(obj)
