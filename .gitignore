@@ -17,3 +17,6 @@ serviceCredentials.json
 # datasets not needed
 data-subsets/business-licences-subset.numbers
 data-subsets/business-owners-subset.numbers
+
+# vs code files
+.vscode/
