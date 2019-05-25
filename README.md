@@ -10,7 +10,7 @@ This is now virtually a script that could be tweaked to fit any model for readin
 
 1. To run this script, first set up a Python virtual environment called env from the root directory of the project
 
-  - `python3 -r venv env`
+  - `python3 -m venv env`
 
 
 2. Next, install the dependencies by running from the root folder of the directory
